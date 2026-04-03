@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Barbeiro - Corte Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/visual-improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/modern-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/proximos-agendamentos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/header-navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/header-modern.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/agenda-inteligente.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/precos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/barbeiro/barbeiro-professional.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/light-theme.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div id="dashboard-barbeiro" class="screen active">
+        <!-- Header Moderno -->
+        <header class="barber-header">
+            <div class="barber-header-container">
+                <!-- Brand -->
+                <div class="barber-header-brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-scissors"></i>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">Corte Digital</span>
+                        <span class="brand-subtitle">Painel Profissional</span>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="barber-header-nav">
+                    <button class="nav-item active" onclick="showSection('home-barbeiro')" data-section="home-barbeiro">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('agenda-inteligente')" data-section="agenda-inteligente">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Agenda</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('precos-barbeiro')" data-section="precos-barbeiro">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Preços</span>
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='/chat'">
+                        <i class="fas fa-comments"></i>
+                        <span>Mensagens</span>
+                    </button>
+                </nav>
+
+                <!-- Actions -->
+                <div class="barber-header-actions">
+                    <div class="user-menu">
+                        <button class="user-menu-btn" onclick="toggleUserMenu()">
+                            <div class="user-avatar">{{ nome[0] if nome else 'B' }}</div>
+                            <span class="user-name">{{ nome }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-menu-dropdown" id="user-menu-dropdown">
+                            <a href="#" onclick="logout(); return false;" class="menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Layout principal -->
+        <div class="app-layout" style="grid-template-columns: 1fr;">
+            <main class="app-main" style="max-width: 1400px; margin: 0 auto; width: 100%;">
+                
+                <!-- Dashboard Home -->
+                <div id="home-barbeiro" class="content-section active">
+                    <!-- Hero Section -->
+                    <div class="barber-hero">
+                        <div class="barber-hero-content">
+                            <div class="barber-hero-greeting">
+                                <h1>Olá, {{ nome }}! 👋</h1>
+                                <p>Bem-vindo ao seu painel profissional</p>
+                            </div>
+                            <div class="barber-hero-stats">
+                                <div class="hero-stat-item">
+                                    <div class="hero-stat-icon">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <div class="hero-stat-content">
+                                        <div class="hero-stat-value" id="hero-stat-hoje">0</div>
+                                        <div class="hero-stat-label">Hoje</div>
+                                    </div>
+                                </div>
+                                <div class="hero-stat-item">
+                                    <div class="hero-stat-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="hero-stat-content">
+                                        <div class="hero-stat-value" id="hero-stat-proximos">0</div>
+                                        <div class="hero-stat-label">Próximos</div>
+                                    </div>
+                                </div>
+                                <div class="hero-stat-item">
+                                    <div class="hero-stat-icon">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="hero-stat-content">
+                                        <div class="hero-stat-value">R$ <span id="hero-stat-faturamento">0,00</span></div>
+                                        <div class="hero-stat-label">Últimos 7 dias</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Próximos Agendamentos na Hero -->
+                        <div class="hero-upcoming-appointments" id="hero-upcoming-appointments">
+                            <div class="hero-upcoming-header">
+                                <h3><i class="fas fa-clock"></i> Próximos Agendamentos</h3>
+                            </div>
+                            <div class="hero-upcoming-list" id="hero-upcoming-list">
+                                <div class="hero-upcoming-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Carregando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="barber-hero-actions">
+                        <button class="hero-action-btn primary" onclick="showSection('agenda-inteligente')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Ver Agenda Completa</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agenda Inteligente Ultra Moderna -->
+                <div id="agenda-inteligente" class="content-section">
+                    <div class="agenda-digital-container">
+                        
+                        <!-- Header Limpo -->
+                        <div class="agenda-digital-header">
+                            <div class="agenda-digital-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                <h2>Agenda Inteligente</h2>
+                            </div>
+                            
+                            <!-- Stats Minimalistas -->
+                            <div class="agenda-digital-stats">
+                                <div class="stat-badge stat-today">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span id="agenda-stat-hoje">0</span>
+                                    <div class="stat-label">Hoje</div>
+                                </div>
+                                <div class="stat-badge stat-confirmed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="agenda-stat-confirmados">0</span>
+                                    <div class="stat-label">Confirmados</div>
+                                </div>
+                                <div class="stat-badge stat-pending">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="agenda-stat-pendentes">0</span>
+                                    <div class="stat-label">Pendentes</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controles Limpos -->
+                        <div class="agenda-digital-controls">
+                            <!-- Navegação de Data -->
+                            <div class="agenda-date-nav">
+                                <button class="date-nav-btn" onclick="previousDay()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="current-date-display">
+                                    <div class="date-day" id="date-day-name">Hoje</div>
+                                    <div class="date-full" id="date-full-text">Carregando...</div>
+                                </div>
+                                <button class="date-nav-btn" onclick="nextDay()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <button class="date-nav-btn today-btn" onclick="goToToday()">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Hoje
+                                </button>
+                            </div>
+
+                            <!-- Filtros Simples -->
+                            <div class="agenda-quick-filters">
+                                <button class="quick-filter-btn active" onclick="setQuickFilter('todos')" data-filter="todos">
+                                    Todos
+                                </button>
+                                <button class="quick-filter-btn" onclick="setQuickFilter('pendente')" data-filter="pendente">
+                                    Pendentes
+                                </button>
+                                <button class="quick-filter-btn" onclick="setQuickFilter('confirmado')" data-filter="confirmado">
+                                    Confirmados
+                                </button>
+                                <button class="quick-filter-btn" onclick="setQuickFilter('concluido')" data-filter="concluido">
+                                    Concluídos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Limpa -->
+                        <div class="agenda-digital-timeline" id="agenda-digital-timeline">
+                            <div class="timeline-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Carregando agendamentos...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preços -->
+                <div id="precos-barbeiro" class="content-section">
+                    <div class="precos-container">
+                        
+                        <!-- Header -->
+                        <div class="precos-header">
+                            <div class="precos-header-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="precos-header-content">
+                                <h2>Meus Preços</h2>
+                                <p>Gerencie os valores dos seus serviços</p>
+                            </div>
+                        </div>
+
+                        <!-- Formulário de Preços -->
+                        <div class="precos-form-card">
+                            <h3 class="precos-form-title">Configure seus preços</h3>
+                            <p class="precos-form-subtitle">
+                                Defina o valor que você cobra por cada serviço. Clientes frequentes (com mais de 5 agendamentos) serão notificados automaticamente.
+                            </p>
+                            
+                            <form id="prices-form" onsubmit="handlePricesSubmit(event)">
+                                <div class="precos-grid">
+                                    <!-- Corte -->
+                                    <div class="preco-input-group">
+                                        <label class="preco-label">
+                                            <i class="fas fa-cut"></i>
+                                            <span>Corte</span>
+                                        </label>
+                                        <div class="preco-input-wrapper">
+                                            <span class="preco-input-prefix">R$</span>
+                                            <input 
+                                                id="price-corte" 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="0" 
+                                                class="preco-input" 
+                                                placeholder="35.00" 
+                                                required
+                                                oninput="updatePreview()">
+                                        </div>
+                                        <small class="preco-hint">Corte de cabelo masculino</small>
+                                    </div>
+                                    
+                                    <!-- Corte + Barba -->
+                                    <div class="preco-input-group">
+                                        <label class="preco-label">
+                                            <i class="fas fa-cut"></i>
+                                            <i class="fas fa-user-tie"></i>
+                                            <span>Corte + Barba</span>
+                                        </label>
+                                        <div class="preco-input-wrapper">
+                                            <span class="preco-input-prefix">R$</span>
+                                            <input 
+                                                id="price-corte-barba" 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="0" 
+                                                class="preco-input" 
+                                                placeholder="55.00" 
+                                                required
+                                                oninput="updatePreview()">
+                                        </div>
+                                        <small class="preco-hint">Corte + barba completa</small>
+                                    </div>
+                                    
+                                    <!-- Barba -->
+                                    <div class="preco-input-group">
+                                        <label class="preco-label">
+                                            <i class="fas fa-user-tie"></i>
+                                            <span>Barba</span>
+                                        </label>
+                                        <div class="preco-input-wrapper">
+                                            <span class="preco-input-prefix">R$</span>
+                                            <input 
+                                                id="price-barba" 
+                                                type="number" 
+                                                step="0.01" 
+                                                min="0" 
+                                                class="preco-input" 
+                                                placeholder="25.00" 
+                                                required
+                                                oninput="updatePreview()">
+                                        </div>
+                                        <small class="preco-hint">Aparar e modelar barba</small>
+                                    </div>
+                                </div>
+
+                                <!-- Preview -->
+                                <div class="precos-preview">
+                                    <div class="precos-preview-title">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Preview dos preços</span>
+                                    </div>
+                                    <div class="precos-preview-list">
+                                        <div class="precos-preview-item">
+                                            <span class="precos-preview-servico">Corte</span>
+                                            <span class="precos-preview-valor" id="preview-corte">R$ 0,00</span>
+                                        </div>
+                                        <div class="precos-preview-item">
+                                            <span class="precos-preview-servico">Corte + Barba</span>
+                                            <span class="precos-preview-valor" id="preview-corte-barba">R$ 0,00</span>
+                                        </div>
+                                        <div class="precos-preview-item">
+                                            <span class="precos-preview-servico">Barba</span>
+                                            <span class="precos-preview-valor" id="preview-barba">R$ 0,00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Footer -->
+                                <div class="precos-form-footer">
+                                    <div class="precos-status">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Pronto para salvar</span>
+                                    </div>
+                                    <button type="submit" class="btn-salvar-precos">
+                                        <i class="fas fa-save"></i>
+                                        <span>Salvar Preços</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Dicas -->
+                        <div class="precos-dicas-card">
+                            <h3 class="precos-dicas-title">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Dicas de Precificação</span>
+                            </h3>
+                            <ul class="precos-dicas-list">
+                                <li class="precos-dica-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Pesquise os preços da concorrência na sua região</span>
+                                </li>
+                                <li class="precos-dica-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Considere sua experiência e qualificações</span>
+                                </li>
+                                <li class="precos-dica-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Ofereça desconto no combo (Corte + Barba)</span>
+                                </li>
+                                <li class="precos-dica-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Clientes frequentes (>5 agendamentos) serão notificados automaticamente</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/shared/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/barbeiro/barbeiro-dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/barbeiro/precos.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    
+    <script>
+        console.log('🎯 Script inline do template carregado');
+        console.log('🔍 Verificando elementos:', {
+            dashboard: document.getElementById('dashboard-barbeiro'),
+            heroStatHoje: document.getElementById('hero-stat-hoje'),
+            revenue7days: document.getElementById('revenue-7days')
+        });
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Atualizar navegação
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            // Inicializar seções específicas
+            if (sectionId === 'agenda-inteligente' && typeof initAgendaInteligente === 'function') {
+                initAgendaInteligente();
+            }
+            
+            if (sectionId === 'precos-barbeiro' && typeof initPrecos === 'function') {
+                initPrecos();
+            }
+            
+
+        }
+        
+        function toggleUserMenu() {
+            const menu = document.querySelector('.user-menu');
+            menu.classList.toggle('active');
+        }
+        
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', (e) => {
+            const menu = document.querySelector('.user-menu');
+            if (menu && !menu.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+        
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('prod-name').value;
+            const qty = document.getElementById('prod-qty').value;
+            const price = document.getElementById('prod-price').value;
+            
+            try {
+                const response = await fetch('/api/inventory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        quantity: Number(qty),
+                        price: Number(price)
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    e.target.reset();
+                    alert('Produto adicionado com sucesso!');
+                    loadProducts();
+                } else {
+                    alert('Erro ao adicionar produto: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao adicionar produto');
+            }
+        }
+        
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/inventory');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const products = result.data || [];
+                    const container = document.getElementById('products-list');
+                    
+                    if (products.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state-modern">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <div class="empty-state-title">Nenhum produto cadastrado</div>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    container.innerHTML = products.map(p => `
+                        <div class="elegant-card" style="padding: 16px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; color: var(--color-text);">${p.name}</div>
+                                    <div style="font-size: 14px; color: var(--color-text-secondary); margin-top: 4px;">
+                                        Quantidade: ${p.quantity} | Preço: R$ ${parseFloat(p.price).toFixed(2)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+        
+        async function loadBarberPrices() {
+            try {
+                const response = await fetch('/api/barber-prices');
+                const result = await response.json();
+                
+                if (result.success) {
+                    const prices = result.data || {};
+                    document.getElementById('price-corte').value = prices['Corte'] || 35.00;
+                    document.getElementById('price-corte-barba').value = prices['Corte + Barba'] || 55.00;
+                    document.getElementById('price-barba').value = prices['Barba'] || 25.00;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar preços:', error);
+            }
+        }
+        
+        async function handlePricesSubmit(e) {
+            e.preventDefault();
+            
+            const prices = {
+                'Corte': parseFloat(document.getElementById('price-corte').value),
+                'Corte + Barba': parseFloat(document.getElementById('price-corte-barba').value),
+                'Barba': parseFloat(document.getElementById('price-barba').value)
+            };
+            
+            try {
+                const response = await fetch('/api/barber-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(prices)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Preços atualizados com sucesso!');
+                } else {
+                    alert('Erro ao atualizar preços: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao atualizar preços');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstBtn = document.querySelector('.nav-item');
+            if (firstBtn) firstBtn.classList.add('active');
+            loadProducts();
+            loadBarberPrices();
+        });
+    </script>
+</body>
+</html>

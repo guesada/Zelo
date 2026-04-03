@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Cliente - Corte Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/visual-improvements.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/modern-upgrade.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/proximos-agendamentos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/header-navbar.css') }}">
+    <!-- Cliente CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/header-modern.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/hero-modern.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/dashboard-nova.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/theme-verde.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/agendamentos-tab.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/servicos-modernos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/historico.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/cancel-modal.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/novo-agendamento.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/booking-form.css') }}?v=12">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cliente/calendar-picker.css') }}?v=12">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+<div id="dashboard-cliente" class="screen active">
+        <!-- Header Moderno -->
+        <header class="cliente-header">
+            <div class="cliente-header-container">
+                <!-- Brand -->
+                <div class="cliente-header-brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-scissors"></i>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">Corte Digital</span>
+                        <span class="brand-subtitle">Seu Estilo, Nossa Paixão</span>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="cliente-header-nav">
+                    <button class="nav-item active" onclick="showSection('home-cliente')" data-section="home-cliente">
+                        <i class="fas fa-home"></i>
+                        <span>Início</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('agendamentos-cliente')" data-section="agendamentos-cliente">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Agendamentos</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('historico-cliente')" data-section="historico-cliente">
+                        <i class="fas fa-history"></i>
+                        <span>Histórico</span>
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='/chat'">
+                        <i class="fas fa-comments"></i>
+                        <span>Mensagens</span>
+                    </button>
+                </nav>
+
+                <!-- Actions -->
+                <div class="cliente-header-actions">
+                    <div class="user-menu">
+                        <button class="user-menu-btn" onclick="toggleUserMenu()">
+                            <div class="user-avatar">{{ nome[0] if nome else 'C' }}</div>
+                            <span class="user-name">{{ nome }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-menu-dropdown" id="user-menu-dropdown">
+                            <a href="#" onclick="logout(); return false;" class="menu-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Layout principal sem sidebar -->
+        <div class="app-layout" style="grid-template-columns: 1fr;">
+            <!-- Conteúdo principal -->
+            <main class="app-main" style="max-width: 1400px; margin: 0 auto; width: 100%;">
+                <!-- Dashboard Home -->
+                <div id="home-cliente" class="content-section active">
+                    
+                    <!-- Hero Section -->
+                    <div class="cliente-hero">
+                        <div class="cliente-hero-background">
+                            <div class="hero-circle hero-circle-1"></div>
+                            <div class="hero-circle hero-circle-2"></div>
+                            <div class="hero-circle hero-circle-3"></div>
+                        </div>
+                        
+                        <div class="cliente-hero-content">
+                            <div class="hero-greeting">
+                                <h1>Olá, {{ nome }}! 👋</h1>
+                                <p>Pronto para seu próximo visual incrível?</p>
+                            </div>
+                            
+                            <div class="hero-stats-quick">
+                                <div class="quick-stat">
+                                    <div class="quick-stat-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="quick-stat-content">
+                                        <div class="quick-stat-value" id="hero-stat-ativos">0</div>
+                                        <div class="quick-stat-label">Ativos</div>
+                                    </div>
+                                </div>
+                                <div class="quick-stat">
+                                    <div class="quick-stat-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="quick-stat-content">
+                                        <div class="quick-stat-value" id="hero-stat-concluidos">0</div>
+                                        <div class="quick-stat-label">Concluídos</div>
+                                    </div>
+                                </div>
+                                <div class="quick-stat">
+                                    <div class="quick-stat-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="quick-stat-content">
+                                        <div class="quick-stat-value" id="hero-stat-proximo">--</div>
+                                        <div class="quick-stat-label">Próximo</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="hero-actions">
+                                <button class="hero-btn primary" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('novo-agendamento'), 100);">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <span>Agendar Novo Corte</span>
+                                </button>
+                                <button class="hero-btn secondary" onclick="showSection('agendamentos-cliente'); setTimeout(() => switchTab('meus-agendamentos'), 100);">
+                                    <i class="fas fa-list"></i>
+                                    <span>Meus Agendamentos</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Próximos Agendamentos -->
+                    <div class="proximos-section">
+                        <div class="section-header-modern">
+                            <div>
+                                <h2>Próximos Agendamentos</h2>
+                                <p>Seus compromissos agendados</p>
+                            </div>
+                            <button class="btn-link" onclick="showSection('agendamentos-cliente')">
+                                Ver todos <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="proximos-agendamentos-lista" class="appointments-preview">
+                            <!-- Será preenchido via JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+
+                
+                <!-- Agendamentos com Abas -->
+                <div id="agendamentos-cliente" class="content-section">
+                    <div class="agendamentos-page-header">
+                        <div class="agendamentos-page-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h2>Agendamentos</h2>
+                        </div>
+                        <p class="agendamentos-page-subtitle">Gerencie seus agendamentos e agende novos cortes</p>
+                    </div>
+
+                    <!-- Abas -->
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <button class="tab-btn active" onclick="switchTab('meus-agendamentos', event)">
+                                <i class="fas fa-list"></i>
+                                Meus Agendamentos
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('novo-agendamento', event)">
+                                <i class="fas fa-plus"></i>
+                                Novo Agendamento
+                            </button>
+                        </div>
+
+                        <!-- Conteúdo das Abas -->
+                        <div class="tabs-content">
+                            <!-- Aba: Meus Agendamentos -->
+                            <div id="meus-agendamentos" class="tab-panel active">
+                                <div class="agendamentos-list" id="agendamentos-lista">
+                                    <!-- Agendamentos serão carregados via JS -->
+                                </div>
+                            </div>
+
+                            <!-- Aba: Novo Agendamento -->
+                            <div id="novo-agendamento" class="tab-panel">
+                                <div class="booking-container">
+                                    <!-- Indicador de progresso -->
+                                    <div class="booking-progress">
+                                        <div class="progress-line"></div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">1</div>
+                                            <div class="progress-step-label">Barbeiro</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">2</div>
+                                            <div class="progress-step-label">Serviço</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">3</div>
+                                            <div class="progress-step-label">Data/Hora</div>
+                                        </div>
+                                        <div class="progress-step">
+                                            <div class="progress-step-circle">4</div>
+                                            <div class="progress-step-label">Confirmar</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Etapa 1: Escolher Barbeiro -->
+                                    <div id="booking-step-1" class="booking-step active">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha o Barbeiro</h3>
+                                            <p class="booking-step-subtitle">Selecione o profissional de sua preferência</p>
+                                        </div>
+                                        <div class="barbers-grid" id="barbers-grid-new"></div>
+                                    </div>
+
+                                    <!-- Etapa 2: Escolher Serviço -->
+                                    <div id="booking-step-2" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha o Serviço</h3>
+                                            <p class="booking-step-subtitle">Selecione o serviço que deseja agendar</p>
+                                        </div>
+                                        <div class="services-grid" id="services-grid-new"></div>
+                                    </div>
+
+                                    <!-- Etapa 3: Escolher Data e Horário -->
+                                    <div id="booking-step-3" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Escolha Data e Horário</h3>
+                                            <p class="booking-step-subtitle">Selecione o melhor dia e horário para você</p>
+                                        </div>
+                                        <div class="calendar-container">
+                                            <div class="calendar-header">
+                                                <div class="calendar-title" id="calendar-title-new">Dezembro 2024</div>
+                                                <div class="calendar-nav">
+                                                    <button class="calendar-nav-btn" onclick="prevMonth()">
+                                                        <i class="fas fa-chevron-left"></i>
+                                                    </button>
+                                                    <button class="calendar-nav-btn" onclick="nextMonth()">
+                                                        <i class="fas fa-chevron-right"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="calendar-grid" id="calendar-grid-new"></div>
+                                            <div class="time-slots" id="time-slots-new"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Etapa 4: Confirmar -->
+                                    <div id="booking-step-4" class="booking-step">
+                                        <div class="booking-step-header">
+                                            <h3 class="booking-step-title">Confirmar Agendamento</h3>
+                                            <p class="booking-step-subtitle">Revise os detalhes do seu agendamento</p>
+                                        </div>
+                                        <div class="booking-summary" id="booking-summary-new"></div>
+                                    </div>
+
+                                    <!-- Botões de navegação -->
+                                    <div class="booking-actions">
+                                        <button class="btn-booking btn-booking-back" onclick="prevBookingStep()" id="btn-booking-back">
+                                            <i class="fas fa-arrow-left"></i>
+                                            <span>Voltar</span>
+                                        </button>
+                                        <button class="btn-booking btn-booking-next" onclick="nextBookingStep()" id="btn-booking-next" disabled>
+                                            <span>Próximo</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Histórico Cliente -->
+                <div id="historico-cliente" class="content-section">
+                    <div class="historico-header">
+                        <div class="historico-header-content">
+                            <div class="historico-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>
+                                <h2>Histórico de Serviços</h2>
+                                <p>Todos os seus atendimentos realizados</p>
+                            </div>
+                        </div>
+                        <div class="historico-stats">
+                            <div class="historico-stat-item">
+                                <span class="historico-stat-value" id="historico-total">0</span>
+                                <span class="historico-stat-label">Total</span>
+                            </div>
+                            <div class="historico-stat-item">
+                                <span class="historico-stat-value">R$ <span id="historico-gasto">0,00</span></span>
+                                <span class="historico-stat-label">Investido</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="historico-timeline" id="historico-lista">
+                        <!-- Histórico será carregado via JS -->
+                    </div>
+                </div>
+
+
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Shared JS -->
+    <script src="{{ url_for('static', filename='js/shared/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shared/micro-interactions.js') }}"></script>
+    <!-- Cliente JS -->
+    <script src="{{ url_for('static', filename='js/cliente/dashboard-nova.js') }}?v=8"></script>
+    <script src="{{ url_for('static', filename='js/cliente/novo-agendamento.js') }}?v=8"></script>
+    <!-- Main Index -->
+    <script src="{{ url_for('static', filename='js/index.js') }}?v=8"></script>
+    
+    <script>
+        // Função para alternar menu do usuário
+        function toggleUserMenu() {
+            const menu = document.querySelector('.user-menu');
+            menu.classList.toggle('active');
+        }
+        
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', (e) => {
+            const menu = document.querySelector('.user-menu');
+            if (menu && !menu.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+        
+        // Atualizar navegação ao trocar de seção
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Atualizar navegação
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            // Carregar dados específicos da seção
+            if (sectionId === 'historico-cliente' && typeof loadHistoricoCliente === 'function') {
+                loadHistoricoCliente();
+            }
+            if (sectionId === 'agendamentos-cliente' && typeof carregarAgendamentos === 'function') {
+                carregarAgendamentos();
+            }
+            if (sectionId === 'home-cliente' && typeof loadClienteDashboard === 'function') {
+                loadClienteDashboard();
+            }
+        }
+    </script>
+</body>
+</html>
